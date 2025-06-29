@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-
+#include <string>
+#include <sstream>
+#include <algorithm>
 using namespace std;
 
 // Definition for a Node.
@@ -13,9 +15,7 @@ public:
     Node* next;
 
     Node() : val(0), left(nullptr), right(nullptr), next(nullptr) {}
-
     Node(int _val) : val(_val), left(nullptr), right(nullptr), next(nullptr) {}
-
     Node(int _val, Node* _left, Node* _right, Node* _next)
         : val(_val), left(_left), right(_right), next(_next) {}
 };
@@ -23,59 +23,43 @@ public:
 class Solution {
 public:
     Node* connect(Node* root) {
-        if(!root){
-            return NULL;
+        if (!root) {
+            return nullptr;
         }
-        Node* leftmost=root;
-        while(leftmost->left){
-            Node* head=leftmost;
-            while(head){
-                head->left->next=head->right;
-                if(head->next){
-                    head->right->next=head->next->left;
+        Node* leftmost = root;
+        while (leftmost->left) {
+            Node* head = leftmost;
+            while (head) {
+                head->left->next = head->right;
+                if (head->next) {
+                    head->right->next = head->next->left;
                 }
-                head=head->next;
+                head = head->next;
             }
-            leftmost=leftmost->left;
+            leftmost = leftmost->left;
         }
         return root;
     }
 };
 
-// Helper function to create a binary tree from a vector
-Node* createTree(const vector<int>& nodes, int i) {
-    if (i >= nodes.size() || nodes[i] == -1) return nullptr;
-    Node* root = new Node(nodes[i]);
-    root->left = createTree(nodes, 2 * i + 1);
-    root->right = createTree(nodes, 2 * i + 2);
-    return root;
-}
-
-// Helper function to print the tree according to next pointers
+// Helper function to print the tree level by level using next pointers
 void printTree(Node* root) {
-    if (!root) {
+    if (root == nullptr) {
         cout << "[]" << endl;
         return;
     }
-    
-    cout << "[";
     Node* levelStart = root;
-    bool first = true;
-    
-    while (levelStart) {
-        Node* curr = levelStart;
-        while (curr) {
-            if (!first) {
+    cout << "[";
+    while (levelStart != nullptr) {
+        Node* current = levelStart;
+        while (current != nullptr) {
+            cout << current->val;
+            if (current->next != nullptr) {
                 cout << ",";
             }
-            cout << curr->val;
-            first = false;
-            curr = curr->next;
+            current = current->next;
         }
-        if (levelStart->left) {
-            cout << ",#";
-            first = true;
-        }
+        cout << ",#";
         levelStart = levelStart->left;
     }
     cout << "]" << endl;
@@ -83,22 +67,27 @@ void printTree(Node* root) {
 
 int main() {
     Solution solution;
-    
-    // Test case 1
-    vector<int> nodes1 = {1, 2, 3, 4, 5, 6, 7};
-    Node* root1 = createTree(nodes1, 0);
+
+    // Example 1: [1,2,3,4,5,6,7]
+    Node* root = new Node(1);
+    root->left = new Node(2);
+    root->right = new Node(3);
+    root->left->left = new Node(4);
+    root->left->right = new Node(5);
+    root->right->left = new Node(6);
+    root->right->right = new Node(7);
+
     cout << "Input: root = [1,2,3,4,5,6,7]" << endl;
-    root1 = solution.connect(root1);
+    root = solution.connect(root);
     cout << "Output: ";
-    printTree(root1);
-    
-    // Test case 2
-    vector<int> nodes2;
-    Node* root2 = nullptr;
+    printTree(root);
+
+    // Example 2: []
+    Node* emptyRoot = nullptr;
     cout << "Input: root = []" << endl;
-    root2 = solution.connect(root2);
+    emptyRoot = solution.connect(emptyRoot);
     cout << "Output: ";
-    printTree(root2);
-    
+    printTree(emptyRoot);
+
     return 0;
 }
